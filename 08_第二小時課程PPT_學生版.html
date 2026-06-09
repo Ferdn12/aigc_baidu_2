@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 AIGC 中級｜第二小時：算法精講 + 實操（學生版）</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif; background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); color: #fff; min-height: 100vh; overflow: hidden; }
+        .slide { height: 100vh; padding: 45px 60px; display: none; flex-direction: column; justify-content: center; position: relative; overflow-y: auto; }
+        .slide.active { display: flex; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        .slide-number { position: absolute; bottom: 22px; right: 35px; font-size: 14px; opacity: 0.4; font-family: 'Consolas', monospace; }
+        .phase-tag { position: absolute; top: 22px; left: 35px; font-size: 13px; padding: 5px 14px; border-radius: 18px; font-weight: bold; letter-spacing: 1px; }
+        .phase-0 { background: rgba(255,209,102,0.3); border: 1px solid #ffd166; color: #ffd166; }
+        .phase-alg { background: rgba(76,201,240,0.3); border: 1px solid #4cc9f0; color: #4cc9f0; }
+        .phase-multi { background: rgba(247,37,133,0.3); border: 1px solid #f72585; color: #f72585; }
+        .phase-task { background: rgba(114,239,221,0.3); border: 1px solid #72efdd; color: #72efdd; }
+        .phase-must { background: rgba(255,154,89,0.3); border: 1px solid #ff9a59; color: #ff9a59; }
+        .phase-end { background: rgba(180,180,255,0.3); border: 1px solid #b4b4ff; color: #b4b4ff; }
+        .timer-tag { position: absolute; top: 22px; right: 35px; font-size: 13px; padding: 5px 14px; border-radius: 18px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); font-family: 'Consolas', monospace; }
+
+        .slide-title { font-size: 40px; margin-bottom: 26px; color: #4cc9f0; text-shadow: 0 0 10px rgba(76,201,240,0.3); border-left: 5px solid #f72585; padding-left: 18px; line-height: 1.3; }
+        .slide-title.center { border-left: none; padding-left: 0; text-align: center; }
+        .content { font-size: 20px; line-height: 1.7; max-width: 1240px; }
+
+        .highlight { color: #f72585; font-weight: bold; }
+        .cyan { color: #4cc9f0; font-weight: bold; }
+        .green { color: #72efdd; font-weight: bold; }
+        .yellow { color: #ffd166; font-weight: bold; }
+        .orange { color: #ff9a59; font-weight: bold; }
+        .red { color: #ff4757; font-weight: bold; }
+        .dim { color: #888; font-size: 0.85em; }
+
+        .code-block { background: #1a1a2e; padding: 16px 22px; border-radius: 10px; font-family: 'Consolas', 'Courier New', monospace; font-size: 17px; border: 1px solid #4cc9f0; margin-top: 12px; white-space: pre-wrap; line-height: 1.6; overflow-x: auto; }
+        .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 14px; }
+        .columns-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-top: 14px; }
+        .card { background: rgba(255,255,255,0.05); padding: 20px 22px; border-radius: 14px; border-left: 3px solid #4cc9f0; }
+        .card.pink { border-left-color: #f72585; } .card.green-border { border-left-color: #72efdd; } .card.yellow-border { border-left-color: #ffd166; } .card.red-border { border-left-color: #ff4757; } .card.orange-border { border-left-color: #ff9a59; }
+        .card h3 { color: #4cc9f0; margin-bottom: 10px; font-size: 22px; }
+        .card.pink h3 { color: #f72585; } .card.green-border h3 { color: #72efdd; } .card.yellow-border h3 { color: #ffd166; } .card.red-border h3 { color: #ff4757; } .card.orange-border h3 { color: #ff9a59; }
+
+        .quote-box { background: rgba(247,37,133,0.1); border-left: 4px solid #f72585; padding: 18px 25px; margin: 12px 0; border-radius: 0 12px 12px 0; font-size: 22px; line-height: 1.6; }
+        .quote-box.cyan-quote { background: rgba(76,201,240,0.1); border-left-color: #4cc9f0; }
+        .quote-box.yellow-quote { background: rgba(255,209,102,0.1); border-left-color: #ffd166; }
+        .quote-box.green-quote { background: rgba(114,239,221,0.1); border-left-color: #72efdd; }
+
+        .keypoint-box { background: linear-gradient(135deg, rgba(76,201,240,0.08), rgba(247,37,133,0.08)); border: 2px solid #4cc9f0; border-radius: 12px; padding: 24px 26px; margin-top: 14px; font-size: 20px; line-height: 1.75; position: relative; }
+        .keypoint-box::before { content: "重點訊息"; position: absolute; top: -13px; left: 18px; background: #4cc9f0; color: #1a1a2e; padding: 3px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; letter-spacing: 2px; }
+        .keypoint-box.pink-key { border-color: #f72585; }
+        .keypoint-box.pink-key::before { content: "核心觀念"; background: #f72585; color: #fff; }
+        .keypoint-box.green-key { border-color: #72efdd; }
+        .keypoint-box.green-key::before { content: "考試金句"; background: #72efdd; color: #1a1a2e; }
+        .keypoint-box.yellow-key { border-color: #ffd166; }
+        .keypoint-box.yellow-key::before { content: "解題技巧"; background: #ffd166; color: #1a1a2e; }
+        .keypoint-box.orange-key { border-color: #ff9a59; }
+        .keypoint-box.orange-key::before { content: "官方答案"; background: #ff9a59; color: #1a1a2e; }
+
+        .question-box { background: #1a1a2e; border: 1px solid #4cc9f0; border-radius: 10px; padding: 18px 24px; margin-top: 12px; font-family: 'Consolas', 'Microsoft JhengHei', monospace; font-size: 19px; line-height: 1.95; }
+        .question-box .opt { display: block; padding: 3px 0; }
+        .question-box .correct { color: #72efdd; font-weight: bold; }
+        .question-box .wrong { color: #ff4757; font-weight: bold; }
+        .question-box .warn, .warn { color: #ffd166; font-weight: bold; }
+
+        .guess-prompt { text-align:center; font-size: 22px; color: #ffd166; margin-top: 16px; padding: 12px; border: 2px dashed #ffd166; border-radius: 10px; background: rgba(255,209,102,0.05); }
+        .guess-prompt::before { content: "🤔  "; }
+
+        .reveal-banner { text-align:center; font-size: 24px; color: #72efdd; margin-bottom: 14px; padding: 8px; background: rgba(114,239,221,0.1); border-radius: 8px; letter-spacing: 4px; }
+        .reveal-banner::before { content: "✨ 答案揭曉 ✨"; }
+
+        .status-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 17px; }
+        .status-table th { text-align: left; padding: 10px 12px; border-bottom: 2px solid #4cc9f0; color: #4cc9f0; font-size: 16px; }
+        .status-table td { padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .status-table td.center { text-align: center; }
+        .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 13px; font-weight: bold; }
+        .badge-red { background: rgba(255,71,87,0.3); color: #ff4757; } .badge-green { background: rgba(114,239,221,0.3); color: #72efdd; } .badge-yellow { background: rgba(255,209,102,0.3); color: #ffd166; } .badge-cyan { background: rgba(76,201,240,0.3); color: #4cc9f0; } .badge-pink { background: rgba(247,37,133,0.3); color: #f72585; } .badge-orange { background: rgba(255,154,89,0.3); color: #ff9a59; }
+
+        .title-slide { text-align: center; justify-content: center; align-items: center; }
+        .title-slide .main-title { font-size: 60px; font-weight: 900; background: linear-gradient(135deg, #4cc9f0, #f72585); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; line-height: 1.2; }
+        .title-slide .subtitle { font-size: 24px; color: #aaa; margin-bottom: 30px; }
+        .title-slide .date-badge { font-size: 16px; padding: 6px 20px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; display: inline-block; color: #888; }
+
+        .round-cover { text-align: center; justify-content: center; align-items: center; }
+        .round-cover .round-tag { font-size: 22px; color: #aaa; letter-spacing: 4px; margin-bottom: 18px; }
+        .round-cover .round-title { font-size: 64px; font-weight: 900; line-height: 1.25; margin-bottom: 22px; }
+        .round-cover .round-meta { font-size: 24px; color: #ccc; }
+
+        .countdown-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 18px; margin-top: 16px; }
+        .countdown-card { background: rgba(255,255,255,0.05); padding: 18px 14px; border-radius: 10px; text-align: center; }
+        .countdown-card .count-number { font-size: 38px; font-weight: 900; }
+        .countdown-card .count-label { font-size: 14px; color: #aaa; margin-top: 6px; line-height: 1.5; }
+
+        .three-port { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 12px; }
+        .three-port .port { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 22px; text-align: center; border-top: 4px solid #4cc9f0; }
+        .three-port .port:nth-child(2) { border-top-color: #f72585; }
+        .three-port .port:nth-child(3) { border-top-color: #72efdd; }
+        .three-port .port .port-icon { font-size: 42px; }
+        .three-port .port .port-title { font-size: 24px; font-weight: bold; margin: 8px 0 10px; }
+        .three-port .port .port-rule { font-size: 24px; color: #ffd166; font-weight: bold; margin-bottom: 10px; }
+        .three-port .port .port-detail { font-size: 17px; color: #aaa; line-height: 1.8; }
+
+        .formula-box { background: rgba(76,201,240,0.08); border: 2px solid #4cc9f0; border-radius: 14px; padding: 26px; text-align: center; margin: 14px 0; }
+        .formula-box .formula-row { font-size: 38px; font-weight: 900; letter-spacing: 6px; }
+        .formula-box .formula-icons { font-size: 32px; letter-spacing: 30px; margin: 12px 0; }
+        .formula-box .formula-warn { font-size: 26px; color: #ff4757; font-weight: 900; letter-spacing: 4px; margin-top: 14px; }
+
+        .agenda-block { background: rgba(255,255,255,0.04); border-radius: 12px; padding: 20px 24px; font-family: 'Consolas', 'Microsoft JhengHei', monospace; font-size: 18px; line-height: 2.1; border: 1px solid rgba(76,201,240,0.3); }
+
+        .tip-box { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); border-radius: 10px; padding: 14px 20px; margin-top: 12px; font-size: 18px; color: #a7f3d0; }
+        .tip-box::before { content: "💡 "; }
+        .warning-box { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.4); border-radius: 10px; padding: 14px 20px; margin-top: 12px; font-size: 18px; color: #fca5a5; }
+        .warning-box::before { content: "⚠️ "; }
+
+        .step-image { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-top: 14px; }
+        .step-image .step-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 22px 12px; text-align: center; border: 2px solid rgba(76,201,240,0.3); }
+        .step-image .step-box .step-icon { font-size: 60px; line-height: 1.1; }
+        .step-image .step-box .step-label { font-size: 22px; font-weight: bold; margin-top: 6px; }
+        .step-image .step-box .step-detail { font-size: 16px; color: #aaa; margin-top: 8px; line-height: 1.6; }
+
+        /* 五段板塊染色:開場黃 / 算法藍 / 多選粉 / 實操綠 / 收尾紫 */
+        .progress-bar-track { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 998;
+            background: linear-gradient(90deg,
+                rgba(255,209,102,0.25) 0% 6%,
+                rgba(76,201,240,0.25) 6% 30%,
+                rgba(247,37,133,0.25) 30% 50%,
+                rgba(114,239,221,0.25) 50% 85%,
+                rgba(180,180,255,0.25) 85% 100%);
+        }
+        .progress-bar { position: fixed; top: 0; left: 0; height: 3px; z-index: 999; transition: width 0.3s ease;
+            background: linear-gradient(90deg,
+                #ffd166 0% 6%,
+                #4cc9f0 6% 30%,
+                #f72585 30% 50%,
+                #72efdd 50% 85%,
+                #b4b4ff 85% 100%);
+            background-size: 100vw 3px;
+            background-attachment: fixed;
+        }
+        .controls { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 100; }
+        .controls button { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: white; padding: 7px 18px; border-radius: 22px; cursor: pointer; transition: all 0.3s ease; font-family: inherit; font-size: 13px; }
+        .controls button:hover { background: #f72585; border-color: #f72585; }
+
+        @media (max-width: 768px) {
+            .slide { padding: 25px 20px; }
+            .slide-title { font-size: 26px; margin-bottom: 16px; }
+            .content { font-size: 16px; }
+            .columns, .columns-3 { grid-template-columns: 1fr; }
+            .three-port, .step-image { grid-template-columns: 1fr; }
+            .countdown-grid { grid-template-columns: 1fr 1fr; }
+            .title-slide .main-title { font-size: 36px; }
+            .round-cover .round-title { font-size: 36px; }
+            .formula-box .formula-row { font-size: 24px; letter-spacing: 3px; }
+            .formula-box .formula-warn { font-size: 18px; }
+            .question-box { font-size: 16px; }
+        }
+
+        @media print {
+            body { background: #fff; color: #000; }
+            .slide { height: auto; page-break-after: always; display: block !important; padding: 20px; }
+            .slide.active { display: block !important; animation: none; }
+            .controls, .progress-bar { display: none; }
+            .slide-title { color: #333; text-shadow: none; border-left-color: #333; }
+            .highlight { color: #c0392b; }
+            .cyan { color: #2980b9; }
+            .green { color: #27ae60; }
+            .yellow { color: #f39c12; }
+            .card { background: #f5f5f5; border-left-color: #333; }
+            .keypoint-box, .quote-box { background: #f0f0f0; border-color: #333; }
+            .keypoint-box::before { background: #333; color: #fff; }
+            .question-box { background: #f9f9f9; border-color: #999; }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar-track"></div>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- ===== S1: Title ===== -->
+    <div class="slide title-slide active" id="slide1">
+        <div class="main-title">第二小時：算法精講 + 實操</div>
+        <div class="subtitle">Transformer × GAN 家族 × Prompt 設計 × API 調用 × RAG</div>
+        <p style="font-size: 19px; color: #ccc; margin-bottom: 22px;">5 大算法 ｜ 5 道多選 ｜ 4 個實操 Task ｜ 60 分鐘</p>
+        <div class="date-badge">2026 AIGC 中級考試輔助課程 &middot; 公眾培訓</div>
+    </div>
+
+    <!-- ===== S2: Agenda ===== -->
+    <div class="slide" id="slide2">
+        <span class="phase-tag phase-0">本小時議程</span>
+        <div class="slide-title">六大板塊 60 分鐘</div>
+        <div class="content">
+            <div class="agenda-block">
+<span class="dim">[01:04-01:05]</span>  <span class="yellow">中場</span>     宣布薄弱主題 + 接力
+<span class="dim">[01:05-01:12]</span>  <span class="cyan">算法 ①</span>   Transformer 位置編碼 + 自注意力
+<span class="dim">[01:12-01:18]</span>  <span class="cyan">算法 ②</span>   GAN 家族辨真偽 (DCGAN / WGAN / CycleGAN)
+<span class="dim">[01:18-01:23]</span>  <span class="cyan">算法 ③</span>   快問快答接龍 (VAE · LSTM · N-gram · 能量基 · 擴散)
+<span class="dim">[01:23-01:32]</span>  <span class="highlight">多選擊破</span>  5 道易錯多選逐題拆
+<span class="dim">[01:32-01:42]</span>  <span class="green">實操 T1</span>   Prompt 設計對戰
+<span class="dim">[01:42-01:47]</span>  <span class="green">實操 T2</span>   Few-Shot / CoT 演練
+<span class="dim">[01:47-01:52]</span>  <span class="green">實操 T3</span>   千帆 API 流式 / 非流式調用
+<span class="dim">[01:52-01:57]</span>  <span class="green">實操 T4</span>   RAG 知識庫問答 Prompt
+<span class="dim">[01:57-02:00]</span>  <span style="color:#b4b4ff;font-weight:bold;">收尾</span>     必記 10 點 + 三色投票
+            </div>
+            <div class="tip-box">第一小時你刷完 100 題，第二小時把<span class="yellow">最薄弱的題目</span>講透。</div>
+        </div>
+    </div>
+
+    <!-- ===== S3: Learning Goals ===== -->
+    <div class="slide" id="slide3">
+        <span class="phase-tag phase-0">學習目標</span>
+        <div class="slide-title">本小時結束你要會什麼</div>
+        <div class="content">
+            <div class="columns-3">
+                <div class="card">
+                    <h3>📊 算法</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:1.8;">
+                    □ Transformer 位置編碼 + 自注意力 + FFN<br>
+                    □ GAN 家族 = DCGAN / WGAN / CycleGAN<br>
+                    □ VAE / LSTM / GRU / N-gram / 能量基 / 擴散
+                    </p>
+                </div>
+                <div class="card pink">
+                    <h3>💥 多選</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:1.8;">
+                    □ 識破三大陷阱：<br>
+                    　混淆 / 定義 / 反向<br>
+                    □ 看到陷阱詞反射性排除
+                    </p>
+                </div>
+                <div class="card green-border">
+                    <h3>⚙️ 實操</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:1.8;">
+                    □ 萬能公式四要素<br>
+                    □ Few-Shot 三段式 + CoT<br>
+                    □ 千帆 API 流式調用<br>
+                    □ RAG 知識庫 Prompt 設計
+                    </p>
+                </div>
+            </div>
+            <div class="quote-box cyan-quote" style="margin-top:14px; font-size:19px; line-height:1.85;">本小時最關鍵的<span class="cyan">3 個記憶錨</span>：<br>
+              ① <span class="highlight">Transformer = 並行 + 注意力 + 位置編碼</span><br>
+              ② <span class="highlight">GAN 家族 = D(卷積) + W(距離) + C(循環)</span><br>
+              ③ <span class="highlight">角色 + 背景 + 目標 + 結構</span>（Prompt 萬能公式）</div>
+        </div>
+    </div>
+
+    <!-- =====================================
+         ALGORITHM SECTION
+         ===================================== -->
+
+    <!-- ===== S4: Algorithm Cover ===== -->
+    <div class="slide round-cover" id="slide4">
+        <span class="phase-tag phase-alg">算法精講</span>
+        <span class="timer-tag">01:05 - 01:23</span>
+        <div class="round-tag">SECTION 1 ／ 算法精講</div>
+        <div class="round-title" style="background: linear-gradient(135deg, #4cc9f0, #72efdd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">🔢 五大算法視覺實驗</div>
+        <div class="round-meta">Transformer ｜ GAN 家族 ｜ VAE · LSTM · N-gram · 能量基 · 擴散 ｜ 18 分鐘</div>
+    </div>
+
+    <!-- ===== S5: Transformer Self-Attention (Guess) ===== -->
+    <div class="slide" id="slide5">
+        <span class="phase-tag phase-alg">算法 ①</span>
+        <span class="timer-tag">自注意力視覺實驗</span>
+        <div class="slide-title">🤔 「它」指的是什麼？</div>
+        <div class="content">
+            <div class="quote-box cyan-quote" style="font-size:24px; text-align:center;">
+                「貓坐在墊子上，因為<span class="highlight">它</span>很溫暖。」
+            </div>
+            <div class="step-image" style="grid-template-columns: 1fr 1fr 1fr; margin-top:20px;">
+                <div class="step-box">
+                    <div class="step-icon">🐱</div>
+                    <div class="step-label cyan">貓</div>
+                    <div class="step-detail">第一個出現<br>語義主體</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-icon">🪑</div>
+                    <div class="step-label yellow">墊子</div>
+                    <div class="step-detail">第二個出現<br>位置更近</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-icon">🌡️</div>
+                    <div class="step-label green">溫暖</div>
+                    <div class="step-detail">形容詞<br>屬性描述</div>
+                </div>
+            </div>
+            <div class="guess-prompt">先在心裡選一個 → 下一頁揭曉</div>
+        </div>
+    </div>
+
+    <!-- ===== S6: Transformer Reveal ===== -->
+    <div class="slide" id="slide6">
+        <span class="phase-tag phase-alg">算法 ①</span>
+        <div class="slide-title">🎯 自注意力揭曉</div>
+        <div class="content">
+            <div class="reveal-banner"></div>
+            <div class="quote-box green-quote" style="font-size:24px; text-align:center;">
+                「它」→ <span class="green">貓</span>（語義相關度最高）
+            </div>
+            <div class="columns" style="margin-top:14px;">
+                <div class="card">
+                    <h3 class="cyan">自注意力機制</h3>
+                    <p style="font-size:18px;color:#ddd;line-height:1.8;">
+                    句子裡每個字都會「看」其他所有字，<br>
+                    然後算出「我跟誰最相關」。<br>
+                    <span class="yellow">「它」跟「貓」的連線最粗</span>。
+                    </p>
+                </div>
+                <div class="card pink">
+                    <h3 class="highlight">位置編碼</h3>
+                    <p style="font-size:18px;color:#ddd;line-height:1.8;">
+                    Transformer 本身不知道「誰在前誰在後」。<br>
+                    位置編碼 = 給每個字一個<span class="yellow">「座位號」</span>。<br>
+                    讓 AI 知道「貓」在第 1 位，「墊子」在第 3 位。
+                    </p>
+                </div>
+            </div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:20px;">
+                中級高頻考點：<br>
+                • 位置編碼為模型提供 token 之間<span class="cyan">時序位置關係</span>（Q1）<br>
+                • Transformer 可以<span class="cyan">並行處理序列</span>，克服 RNN 限制（Q29）<br>
+                • 前饋網絡 FFN 由<span class="cyan">兩層線性變換 + ReLU</span> 組成（Q15）
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S7: Transformer vs RNN ===== -->
+    <div class="slide" id="slide7">
+        <span class="phase-tag phase-alg">算法 ①</span>
+        <div class="slide-title">🔥 Transformer vs RNN 一張圖</div>
+        <div class="content">
+            <div class="columns">
+                <div class="card">
+                    <h3 style="color:#ff9a59;">📜 RNN 家族</h3>
+                    <p style="font-size:18px;color:#ddd;line-height:1.8;text-align:center;">
+                    一個字一個字念<br>
+                    有記憶但<span class="red">慢</span><br>
+                    長句會忘<br>
+                    <span class="dim">LSTM / GRU = 門控改進</span>
+                    </p>
+                </div>
+                <div class="card green-border">
+                    <h3 style="color:#72efdd;">⚡ Transformer</h3>
+                    <p style="font-size:18px;color:#ddd;line-height:1.8;text-align:center;">
+                    全班同時互相看<br>
+                    <span class="green">速度快、可並行</span><br>
+                    長句也記得住<br>
+                    <span class="dim">自注意力 + 位置編碼 + FFN</span>
+                    </p>
+                </div>
+            </div>
+            <div class="keypoint-box pink-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                <span class="red">⚠️ 陷阱警告</span>：「位置編碼是特徵提取」<span class="highlight">大錯</span>！<br>
+                位置編碼 = <span class="green">時序位置關係</span>，不是特徵提取！
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S8: GAN Family Guess ===== -->
+    <div class="slide" id="slide8">
+        <span class="phase-tag phase-alg">算法 ②</span>
+        <span class="timer-tag">GAN 家族辨真偽</span>
+        <div class="slide-title">🤔 這三張圖，哪張是 WGAN 生成？</div>
+        <div class="content">
+            <div class="step-image">
+                <div class="step-box">
+                    <div class="step-icon">🖼️</div>
+                    <div class="step-label cyan">圖 A</div>
+                    <div class="step-detail">人臉較清晰<br>但偶有扭曲<br>背景正常</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-icon">🌟</div>
+                    <div class="step-label yellow">圖 B</div>
+                    <div class="step-detail">人臉非常清晰<br>細節豐富穩定<br>幾乎無瑕疵</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-icon">🦓</div>
+                    <div class="step-label green">圖 C</div>
+                    <div class="step-detail">馬變斑馬<br>風格遷移<br>無配對數據</div>
+                </div>
+            </div>
+            <div class="guess-prompt">A / B / C → 下一頁揭曉</div>
+        </div>
+    </div>
+
+    <!-- ===== S9: GAN Family Reveal ===== -->
+    <div class="slide" id="slide9">
+        <span class="phase-tag phase-alg">算法 ②</span>
+        <div class="slide-title">🎯 GAN 家族揭曉</div>
+        <div class="content">
+            <div class="reveal-banner"></div>
+            <div class="columns-3">
+                <div class="card">
+                    <h3 style="color:#4cc9f0;">圖 A = DCGAN</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.7;">
+                    <span class="yellow">CNN + GAN 結合</span><br>
+                    用<span class="highlight">卷積替代全連接</span><br>
+                    生成圖像更穩定<br>
+                    但偶爾仍有扭曲
+                    </p>
+                </div>
+                <div class="card green-border">
+                    <h3 style="color:#72efdd;">圖 B = WGAN ✅</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.7;">
+                    改用 <span class="yellow">Wasserstein 距離</span><br>
+                    解決訓練不穩定<br>
+                    生成質量大幅提升<br>
+                    人臉非常清晰
+                    </p>
+                </div>
+                <div class="card yellow-border">
+                    <h3 style="color:#ffd166;">圖 C = CycleGAN</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.7;">
+                    <span class="yellow">循環一致性損失</span><br>
+                    <span class="highlight">不需要配對數據</span><br>
+                    就能做風格遷移<br>
+                    馬變斑馬是它的招牌
+                    </p>
+                </div>
+            </div>
+            <div class="keypoint-box pink-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                <span class="red">⚠️ 高頻陷阱</span>：「DCGAN 用全連接替代卷積」<span class="highlight">大錯特錯</span>——<span class="red">反了</span>！<br>
+                「CycleGAN 必須配對數據」也<span class="red">錯</span>——它的賣點就是<span class="green">不用配對</span>！
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S10: GAN Family Table ===== -->
+    <div class="slide" id="slide10">
+        <span class="phase-tag phase-alg">算法 ②</span>
+        <div class="slide-title">📊 GAN 家族對照表 + 口訣</div>
+        <div class="content">
+            <table class="status-table" style="font-size:16px;">
+                <tr><th>特性</th><th>DCGAN</th><th>WGAN</th><th>CycleGAN</th></tr>
+                <tr><td><span class="cyan">核心改進</span></td><td>卷積層替代全連接</td><td>Wasserstein 距離損失</td><td>循環一致性損失</td></tr>
+                <tr><td><span class="cyan">訓練穩定性</span></td><td>較傳統 GAN 改善</td><td>大幅改善</td><td>無需配對數據</td></tr>
+                <tr><td><span class="cyan">典型應用</span></td><td>人臉/物體生成</td><td>高質量圖像生成</td><td>風格遷移/跨域轉換</td></tr>
+                <tr><td><span class="cyan">數據要求</span></td><td>需要真實圖像</td><td>需要真實圖像</td><td><span class="green">不需要配對數據</span></td></tr>
+            </table>
+            <div class="formula-box" style="margin-top:14px;">
+                <div class="formula-row" style="color:#4cc9f0; font-size:32px;">D &nbsp;W &nbsp;C</div>
+                <div style="font-size:20px;color:#ddd;margin-top:10px;line-height:1.8;">
+                    <span class="cyan">D = DCGAN</span>（卷積進 GAN）<br>
+                    <span class="cyan">W = WGAN</span>（距離換損失）<br>
+                    <span class="cyan">C = CycleGAN</span>（循環一致性）
+                </div>
+                <div class="formula-warn" style="font-size:20px;">記住三個「改進點」!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S11: Quick Quiz 10 Questions ===== -->
+    <div class="slide" id="slide11">
+        <span class="phase-tag phase-alg">算法 ③</span>
+        <span class="timer-tag">快問快答 10 題</span>
+        <div class="slide-title">⚡ 算法綜合自測 10 題（先在心裡答）</div>
+        <div class="content">
+            <div class="columns" style="margin-top:6px;">
+                <div class="card">
+                    <h3 style="color:#4cc9f0;">上半 5 題</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.8;">
+                    1. VAE 由哪兩部分組成？<br>
+                    2. 解碼器的作用是？<br>
+                    3. 廣義循環神經網絡包括？<br>
+                    4. LSTM 用什麼機制管理長期記憶？<br>
+                    5. N-gram 中的 N 表示什麼？
+                    </p>
+                </div>
+                <div class="card green-border">
+                    <h3 style="color:#72efdd;">下半 5 題</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.8;">
+                    6. 哪種模型能並行處理序列？<br>
+                    7. 能量基模型訓練目標？<br>
+                    8. 擴散模型最大局限？<br>
+                    9. DCGAN 核心原理？<br>
+                    10. WGAN 相較傳統 GAN 的改進？
+                    </p>
+                </div>
+            </div>
+            <div class="guess-prompt">每題給自己 5 秒 → 下一頁對答案</div>
+        </div>
+    </div>
+
+    <!-- ===== S12: Quick Quiz Answers ===== -->
+    <div class="slide" id="slide12">
+        <span class="phase-tag phase-alg">算法 ③</span>
+        <div class="slide-title">⚡ 10 題答案</div>
+        <div class="content">
+            <table class="status-table" style="font-size:15px;">
+                <tr><th style="width:5%;">#</th><th style="width:30%;">題目</th><th>答案</th><th style="width:22%;">陷阱詞</th></tr>
+                <tr><td>1</td><td>VAE 由哪兩部分組成</td><td><span class="green">編碼器 + 解碼器</span></td><td>不是「分類器 + 回歸器」</td></tr>
+                <tr><td>2</td><td>解碼器的作用是</td><td><span class="green">將潛在表示還原成原始數據</span></td><td>不是「壓縮」——那是編碼器</td></tr>
+                <tr><td>3</td><td>廣義循環神經網絡包括</td><td><span class="green">RNN + LSTM + GRU</span></td><td><span class="red">不含 GCN！</span></td></tr>
+                <tr><td>4</td><td>LSTM 管理長期記憶</td><td><span class="green">門控機制（遺忘/輸入/輸出門）</span></td><td>不是「注意力機制」</td></tr>
+                <tr><td>5</td><td>N-gram 中的 N</td><td><span class="green">上下文長度</span></td><td>不是「詞彙數量」</td></tr>
+                <tr><td>6</td><td>能並行處理序列</td><td><span class="green">Transformer</span></td><td>不是「N-gram」或「RNN」</td></tr>
+                <tr><td>7</td><td>能量基模型訓練目標</td><td><span class="green">真實數據能量盡可能低</span></td><td>不是「盡可能高」——反了！</td></tr>
+                <tr><td>8</td><td>擴散模型最大局限</td><td><span class="green">計算資源消耗極大 / 訓練慢</span></td><td>不是「噪聲不可控」</td></tr>
+                <tr><td>9</td><td>DCGAN 核心原理</td><td><span class="green">CNN + GAN，卷積替代全連接</span></td><td>不是「全連接替代卷積」——反了！</td></tr>
+                <tr><td>10</td><td>WGAN 改進</td><td><span class="green">Wasserstein 距離損失函數</span></td><td>不是「去掉判別器」——結構還在！</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== S13: Algorithm Review Map ===== -->
+    <div class="slide" id="slide13">
+        <span class="phase-tag phase-alg">複習地圖</span>
+        <div class="slide-title">📊 四條技術路線一張圖</div>
+        <div class="content">
+            <div class="columns-3">
+                <div class="card">
+                    <h3 style="color:#ff9a59;">📜 RNN 家族</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.7;text-align:center;">
+                    逐字處理 · 有記憶 · 但慢<br>
+                    LSTM/GRU = 門控改進<br>
+                    <span class="red">已被大模型基本取代</span>
+                    </p>
+                </div>
+                <div class="card green-border">
+                    <h3 style="color:#72efdd;">⚡ Transformer</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.7;text-align:center;">
+                    自注意力 · 看全局 · 可並行<br>
+                    位置編碼 + FFN<br>
+                    <span class="green">大模型骨架 (GPT/BERT)</span>
+                    </p>
+                </div>
+                <div class="card pink">
+                    <h3 style="color:#f72585;">🎭 GAN 家族</h3>
+                    <p style="font-size:16px;color:#ddd;line-height:1.7;text-align:center;">
+                    生成器 vs 判別器博弈<br>
+                    DCGAN / WGAN / CycleGAN<br>
+                    <span class="red">快但不穩</span>
+                    </p>
+                </div>
+            </div>
+            <div class="card orange-border" style="margin-top:14px;">
+                <h3 style="color:#ff9a59; text-align:center;">🌫️ 擴散模型</h3>
+                <p style="font-size:16px;color:#ddd;line-height:1.7;text-align:center;">
+                加噪(前向) → 去噪(反向) ｜ DDPM 最常見 ｜ <span class="green">高質量但計算貴</span>
+                </p>
+            </div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                記住五個直覺：<span class="cyan">注意</span>（自注意力）／ <span class="cyan">座位</span>（位置編碼）／ <span class="cyan">編解</span>（VAE）／ <span class="cyan">門控</span>（LSTM）／ <span class="cyan">博弈</span>（GAN）
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S14: Breathing Slide Algorithm ===== -->
+    <div class="slide" id="slide14">
+        <span class="phase-tag phase-alg">板塊結束</span>
+        <span class="timer-tag">深呼吸 → 進入多選</span>
+        <div class="slide-title">✅ 算法板塊 你已經學會了</div>
+        <div class="content">
+            <div class="agenda-block" style="font-size:20px; line-height:2.4;">
+☑ <span class="cyan">Transformer</span> = 自注意力 + 位置編碼 + FFN（並行處理）
+
+☑ <span class="orange">GAN 家族</span> = DCGAN(卷積) + WGAN(距離) + CycleGAN(循環)
+
+☑ <span class="green">VAE</span> = 編碼器(壓縮) + 解碼器(還原) ——「編壓解還」
+
+☑ <span class="highlight">LSTM</span> = 遺忘門 + 輸入門 + 輸出門（三門）
+
+☑ <span class="cyan">GRU</span> = 更新門 + 重置門（兩門）
+
+☑ <span class="yellow">N-gram</span> = 上下文長度 = N
+
+☑ <span class="green">能量基模型</span> = 真實數據能量<span class="red">低</span>，假數據能量<span class="red">高</span>
+
+☑ <span class="cyan">擴散模型</span> = 加噪(訓練) + 去噪(生成)，計算資源大
+            </div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:24px;">
+                <span class="green">深呼吸一下</span> → 接下來是<span class="highlight">多選擊破</span>，5 題拆透。
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================
+         MULTI-CHOICE SECTION
+         ===================================== -->
+
+    <!-- ===== S15: Multi-choice Cover ===== -->
+    <div class="slide round-cover" id="slide15">
+        <span class="phase-tag phase-multi">多選擊破</span>
+        <span class="timer-tag">01:23 - 01:32</span>
+        <div class="round-tag">SECTION 2 ／ 多選擊破</div>
+        <div class="round-title" style="background: linear-gradient(135deg, #f72585, #ff9a59); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">💥 五道易錯多選逐題拆</div>
+        <div class="round-meta">M19 / M38 / M20 / M11 / M33 ｜ 9 分鐘</div>
+    </div>
+
+    <!-- ===== S16: M19 Question ===== -->
+    <div class="slide" id="slide16">
+        <span class="phase-tag phase-multi">多選 1/5</span>
+        <span class="timer-tag">陷阱類型：🎭 混淆類</span>
+        <div class="slide-title">🔥🔥 M19. 廣義的循環神經網絡模型包括？</div>
+        <div class="content">
+            <div class="question-box">
+<span class="opt">A. RNN</span>
+<span class="opt">B. LSTM</span>
+<span class="opt">C. GCN</span>
+<span class="opt">D. GRU</span>
+            </div>
+            <div class="guess-prompt">複選題：哪些是「RNN 家族」成員？→ 下一頁揭曉</div>
+        </div>
+    </div>
+
+    <!-- ===== S17: M19 Reveal ===== -->
+    <div class="slide" id="slide17">
+        <span class="phase-tag phase-multi">多選 1/5</span>
+        <div class="slide-title">🎯 M19 解答 = ABD</div>
+        <div class="content">
+            <div class="reveal-banner"></div>
+            <div class="question-box">
+<span class="opt correct">✅ A. RNN</span>
+<span class="opt correct">✅ B. LSTM</span>
+<span class="opt warn">⚠️ C. GCN ← 干擾項！圖卷積，不是 RNN 家族</span>
+<span class="opt correct">✅ D. GRU</span>
+            </div>
+            <div class="keypoint-box pink-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                <strong>陷阱類型</strong>：<span class="highlight">混淆類</span>——把另一個模型（GCN）混進來。<br>
+                記住口訣：<span class="cyan">RNN 家族 = RLG = RNN + LSTM + GRU</span>，<span class="red">不含 GCN</span>！
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S18: M38 Question ===== -->
+    <div class="slide" id="slide18">
+        <span class="phase-tag phase-multi">多選 2/5</span>
+        <span class="timer-tag">陷阱類型：🎭 混淆類</span>
+        <div class="slide-title">🔥 M38. GAN 網絡包括以下哪幾種網絡結構？</div>
+        <div class="content">
+            <div class="question-box">
+<span class="opt">A. 生成器</span>
+<span class="opt">B. 判別器</span>
+<span class="opt">C. 變分自編碼器</span>
+<span class="opt">D. 前向擴散過程</span>
+            </div>
+            <div class="guess-prompt">GAN 就只有兩個核心組件——哪些是？</div>
+        </div>
+    </div>
+
+    <!-- ===== S19: M38 Reveal ===== -->
+    <div class="slide" id="slide19">
+        <span class="phase-tag phase-multi">多選 2/5</span>
+        <div class="slide-title">🎯 M38 解答 = AB</div>
+        <div class="content">
+            <div class="reveal-banner"></div>
+            <div class="question-box">
+<span class="opt correct">✅ A. 生成器</span>
+<span class="opt correct">✅ B. 判別器</span>
+<span class="opt warn">⚠️ C. 變分自編碼器 ← 跨模型混淆！那是 VAE</span>
+<span class="opt warn">⚠️ D. 前向擴散過程 ← 跨模型混淆！那是擴散模型</span>
+            </div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:24px;">
+                <span class="cyan">GAN = 生成器 G + 判別器 D，就兩個，沒別的！</span><br>
+                看到 VAE、擴散混進來 → <span class="red">全是干擾項</span>。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S20: M20 Question ===== -->
+    <div class="slide" id="slide20">
+        <span class="phase-tag phase-multi">多選 3/5</span>
+        <span class="timer-tag">陷阱類型：🔄 反向類</span>
+        <div class="slide-title">🔥 M20. 在提示詞构造技巧中，以下哪些是常用的方法？</div>
+        <div class="content">
+            <div class="question-box">
+<span class="opt">A. 变量填充</span>
+<span class="opt">B. 角色定义</span>
+<span class="opt">C. 步骤分解</span>
+<span class="opt">D. 示例引导</span>
+<span class="opt">E. 随机组合</span>
+            </div>
+            <div class="guess-prompt">哪一個聽起來「很厲害卻是反向」？</div>
+        </div>
+    </div>
+
+    <!-- ===== S21: M20 Reveal ===== -->
+    <div class="slide" id="slide21">
+        <span class="phase-tag phase-multi">多選 3/5</span>
+        <div class="slide-title">🎯 M20 解答 = ABCD</div>
+        <div class="content">
+            <div class="reveal-banner"></div>
+            <div class="question-box">
+<span class="opt correct">✅ A. 变量填充</span>
+<span class="opt correct">✅ B. 角色定义</span>
+<span class="opt correct">✅ C. 步骤分解</span>
+<span class="opt correct">✅ D. 示例引导</span>
+<span class="opt warn">⚠️ E. 随机组合 ← 反向設計干擾項！</span>
+            </div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                好的 Prompt 講究<span class="green">結構化、有邏輯</span>——<br>
+                <span class="red">「隨機組合」</span>恰恰會降低輸出質量。<br>
+                記憶口訣：<span class="cyan">「變角步示 = 變量 + 角色 + 步驟 + 示例」</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S22: M11 Question ===== -->
+    <div class="slide" id="slide22">
+        <span class="phase-tag phase-multi">多選 4/5</span>
+        <span class="timer-tag">陷阱類型：🔄 反向類</span>
+        <div class="slide-title">🔥 M11. 生成式 AI 具有哪些特点？</div>
+        <div class="content">
+            <div class="question-box">
+<span class="opt">A. 创造新内容</span>
+<span class="opt">B. 完全依赖于监督学习</span>
+<span class="opt">C. 多样性与创新</span>
+<span class="opt">D. 跨模态生成</span>
+            </div>
+            <div class="guess-prompt">哪個選項把「特點」說成了「缺點」？</div>
+        </div>
+    </div>
+
+    <!-- ===== S23: M11 Reveal ===== -->
+    <div class="slide" id="slide23">
+        <span class="phase-tag phase-multi">多選 4/5</span>
+        <div class="slide-title">🎯 M11 解答 = ACD</div>
+        <div class="content">
+            <div class="reveal-banner"></div>
+            <div class="question-box">
+<span class="opt correct">✅ A. 创造新内容</span>
+<span class="opt warn">⚠️ B. 完全依赖于监督学习 ← 反向干擾！</span>
+<span class="opt correct">✅ C. 多样性与创新</span>
+<span class="opt correct">✅ D. 跨模态生成</span>
+            </div>
+            <div class="keypoint-box pink-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                <strong>陷阱類型</strong>：<span class="highlight">反向類</span>——生成式 AI 大量依賴<span class="green">無監督/自監督學習</span>。<br>
+                「完全依賴監督學習」恰恰是<span class="red">錯誤描述</span>。<br>
+                記憶口訣：<span class="cyan">「創多跨 = 創造 + 多樣 + 跨模態」</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S24: M33 Question ===== -->
+    <div class="slide" id="slide24">
+        <span class="phase-tag phase-multi">多選 5/5</span>
+        <span class="timer-tag">陷阱類型：🔄 反向類</span>
+        <div class="slide-title">🔥 M33. 关于生成式 AI 安全挑战与应对措施，以下哪些说法是正确的？</div>
+        <div class="content">
+            <div class="question-box">
+<span class="opt">A. 生成式 AI 具有复杂性高、解释性差、生成控制難等特点</span>
+<span class="opt">B. 只需在关键环节采取措施即可保障安全性</span>
+<span class="opt">C. 服务提供者有责任指导用户合法合理使用</span>
+<span class="opt">D. 应避免生成或传播违法内容</span>
+            </div>
+            <div class="guess-prompt">安全需要「全鏈路」還是「只做關鍵環節」？</div>
+        </div>
+    </div>
+
+    <!-- ===== S25: M33 Reveal ===== -->
+    <div class="slide" id="slide25">
+        <span class="phase-tag phase-multi">多選 5/5</span>
+        <div class="slide-title">🎯 M33 解答 = ACD</div>
+        <div class="content">
+            <div class="reveal-banner"></div>
+            <div class="question-box">
+<span class="opt correct">✅ A. 复杂性高、解释性差、生成控制難</span>
+<span class="opt warn">⚠️ B. 只需在关键环节采取措施 ← 反向干擾！</span>
+<span class="opt correct">✅ C. 服务提供者有责任指导用户</span>
+<span class="opt correct">✅ D. 应避免生成或传播违法内容</span>
+            </div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                生成式 AI 安全需要<span class="green">全鏈路防護</span>（輸入過濾、模型對齊、輸出審核、用戶教育）。<br>
+                「只需關鍵環節」是<span class="red">過度簡化</span>、不符合監管要求。<br>
+                記憶口訣：<span class="cyan">「全鏈路 ACD = 複雜性(A) + 指導責任(C) + 避免違法(D)」</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S26: Multi-choice 3 Traps ===== -->
+    <div class="slide" id="slide26">
+        <span class="phase-tag phase-multi">多選題口訣</span>
+        <div class="slide-title">💥 多選三大陷阱（看到這些反射性排除）</div>
+        <div class="content">
+            <div class="three-port">
+                <div class="port">
+                    <div class="port-icon">🎭</div>
+                    <div class="port-title cyan">混淆類</div>
+                    <div class="port-rule" style="color:#4cc9f0;">把別人特點混進來</div>
+                    <div class="port-detail">例：GCN 混進 RNN 家族（M19）<br>例：VAE/擴散 混進 GAN（M38）</div>
+                </div>
+                <div class="port">
+                    <div class="port-icon">📖</div>
+                    <div class="port-title highlight">定義類</div>
+                    <div class="port-rule" style="color:#f72585;">名詞定義分不清</div>
+                    <div class="port-detail">例：編碼器 vs 解碼器<br>例：上下文長度 vs 詞彙數量</div>
+                </div>
+                <div class="port">
+                    <div class="port-icon">🔄</div>
+                    <div class="port-title green">反向類</div>
+                    <div class="port-rule" style="color:#72efdd;">問優點卻選了缺點</div>
+                    <div class="port-detail">例：「隨機組合」（M20）<br>例：「完全監督學習」（M11）<br>例：「只需關鍵環節」（M33）</div>
+                </div>
+            </div>
+            <div class="quote-box" style="margin-top:14px;text-align:center;font-size:24px;">看到多選<span class="highlight">先想三類陷阱，再選答案</span>——正確率會跳一個檔。</div>
+        </div>
+    </div>
+
+    <!-- ===== S27: Breathing Slide Multi-choice ===== -->
+    <div class="slide" id="slide27">
+        <span class="phase-tag phase-multi">板塊結束</span>
+        <span class="timer-tag">深呼吸 → 進入實操</span>
+        <div class="slide-title">✅ 多選板塊 你已經學會了</div>
+        <div class="content">
+            <div class="agenda-block" style="font-size:22px; line-height:2.4;">
+☑ <span class="cyan">混淆類</span> 陷阱：把別人的特點偷塞進來 (GCN 進 RNN、VAE 進 GAN)
+
+☑ <span class="highlight">定義類</span> 陷阱：名詞細節分不清 (編碼器 vs 解碼器)
+
+☑ <span class="green">反向類</span> 陷阱：問優點選成缺點 / 反過來
+
+☑ <span class="yellow">看到多選 → 先想三類陷阱再選答案</span>
+            </div>
+            <div class="keypoint-box pink-key" style="margin-top:14px;text-align:center;font-size:24px;">
+                <span class="green">深呼吸一下</span> → 接下來是<span class="highlight">實操板塊</span>，Prompt 設計四式。
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================
+         TASK SECTION
+         ===================================== -->
+
+    <!-- ===== S28: Task Cover ===== -->
+    <div class="slide round-cover" id="slide28">
+        <span class="phase-tag phase-task">實操板塊</span>
+        <span class="timer-tag">01:32 - 01:57</span>
+        <div class="round-tag">SECTION 3 ／ 實操 Task</div>
+        <div class="round-title" style="background: linear-gradient(135deg, #72efdd, #4cc9f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">⚙️ Prompt 設計四式</div>
+        <div class="round-meta">萬能公式 ｜ Few-Shot ｜ API 調用 ｜ RAG 知識庫 ｜ 25 分鐘</div>
+    </div>
+
+    <!-- ===== S29: Writing vs Dialog Model ===== -->
+    <div class="slide" id="slide29">
+        <span class="phase-tag phase-task">先分類</span>
+        <span class="timer-tag">實操題的兩種題型</span>
+        <div class="slide-title">🧠 實操題只有兩種：書寫模型 vs 對話模型</div>
+        <div class="content">
+            <div class="columns">
+                <div class="card">
+                    <h3 style="color:#4cc9f0;">📝 書寫模型</h3>
+                    <p style="font-size:18px;color:#ddd;line-height:1.85;margin-top:8px;">
+                    <strong>一次給任務 → 一次產出</strong><br>
+                    用 <span class="yellow">萬能公式四要素</span> 寫好 Prompt，讓 AI 直接交稿。
+                    </p>
+                    <p style="font-size:16px;color:#aaa;line-height:1.8;margin-top:10px;">
+                    例題：<br>
+                    • 選擇題答題 Prompt（推理過程 + 最終選項）<br>
+                    • 微博文案 / 新聞推薦
+                    </p>
+                </div>
+                <div class="card pink">
+                    <h3 style="color:#f72585;">💬 對話模型</h3>
+                    <p style="font-size:18px;color:#ddd;line-height:1.85;margin-top:8px;">
+                    <strong>多輪你來我往</strong><br>
+                    用 <span class="yellow">對話四元素 / 客服 JSON</span> 設定 AI 的角色、能力、邊界。
+                    </p>
+                    <p style="font-size:16px;color:#aaa;line-height:1.8;margin-top:10px;">
+                    例題：<br>
+                    • 千帆 API 調用<br>
+                    • RAG 知識庫問答
+                    </p>
+                </div>
+            </div>
+            <div class="keypoint-box yellow-key" style="margin-top:14px;text-align:center;font-size:20px;">
+                看到題目先問：這題要 AI <span class="cyan">「寫東西」</span> 還是 <span class="highlight">「跟人聊」</span>？<br>
+                判斷錯類型 → 整題寫法都會偏。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S30: Task 1 Bad vs Good Prompt ===== -->
+    <div class="slide" id="slide30">
+        <span class="phase-tag phase-task">Task 1 ／ 萬能公式</span>
+        <span class="timer-tag">01:32 - 01:42</span>
+        <div class="slide-title">✏️ 爛 Prompt vs 萬能公式版（選擇題答題）</div>
+        <div class="content">
+            <div class="warning-box" style="font-size:18px;">考試評分鐵則：<span style="color:#fff;"><strong>官方關鍵詞要原樣抄，換同義詞會扣分</strong></span>。</div>
+            <div class="columns">
+                <div class="card red-border">
+                    <h3 style="color:#ff4757;">❌ 爛 Prompt</h3>
+                    <div class="code-block" style="margin-top:8px; font-size:18px;">回答這道選擇題</div>
+                    <p style="margin-top:10px;font-size:16px;color:#aaa;">→ AI 可能只給答案，沒有推理過程，格式隨機</p>
+                </div>
+                <div class="card green-border">
+                    <h3 style="color:#72efdd;">✅ 萬能公式版</h3>
+                    <div class="code-block" style="margin-top:8px; font-size:15px;"><span style="color:#4cc9f0;">【定義角色】</span>你是一位專業的選擇題解析助手
+<span style="color:#4cc9f0;">【交代背景】</span>以下是一道關於森林火灾扑火戰術的選擇題
+<span style="color:#4cc9f0;">【任務目標】</span>先給出詳細推理過程，再給出最終選項
+<span style="color:#4cc9f0;">【結構化要求】</span>
+ - 推理過程：逐步分析每個選項
+ - 最終選項：只輸出選項字母(A/B/C/D)</div>
+                </div>
+            </div>
+            <div class="tip-box">同一個任務，<span style="color:#fff;">萬能公式版有結構、有推理、格式對齊</span>。</div>
+        </div>
+    </div>
+
+    <!-- ===== S31: Task 1 Official Answer ===== -->
+    <div class="slide" id="slide31">
+        <span class="phase-tag phase-task">Task 1 ／ 官方答案</span>
+        <div class="slide-title">📚 選擇題答題官方參考 Prompt</div>
+        <div class="content">
+            <div class="code-block" style="font-size:16px;">你是一位專業的選擇題解析助手。
+請針對以下問題，先給出詳細推理過程，
+再給出最終選項。
+
+格式要求：
+推理過程:...(分析每個選項)
+最終選項: X
+
+題目:常用的森林火灾扑火战术不包括哪一种？
+A: 单点突破，长线对进突击战术
+B: 四面包围，全线突击战术
+C: 一次冲击，全线控制战术
+D: 夜间突击战术</div>
+            <div class="keypoint-box orange-key" style="margin-top:14px;text-align:center;font-size:20px;">
+                ⚠️ 三個關鍵：<span class="highlight">必須有「推理過程」+「最終選項」</span>兩個部分<br>
+                角色定義讓 AI 進入「老師模式」——輸出更嚴謹
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S32: 4-Element Formula ===== -->
+    <div class="slide" id="slide32">
+        <span class="phase-tag phase-task">必記公式</span>
+        <div class="slide-title">🎯 Prompt 萬能公式四要素</div>
+        <div class="content">
+            <div class="formula-box">
+                <div class="formula-row" style="color:#72efdd;">角色 + 背景 + 目標 + 結構</div>
+                <div style="font-size:20px;color:#ddd;margin-top:18px;line-height:1.8;">
+                    ① <span class="green">角色</span> — AI 的身份與專業能力<br>
+                    ② <span class="green">背景</span> — 任務上下文 / 場景<br>
+                    ③ <span class="green">目標</span> — 要完成什麼<br>
+                    ④ <span class="green">結構</span> — 輸出格式 / 字數 / 風格
+                </div>
+                <div class="formula-warn">沒有「示例」！</div>
+            </div>
+            <div class="keypoint-box pink-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                <strong>陷阱題</strong>：很多網路教學說要「提供示例」——<br>
+                但<span class="highlight">考試定義的四要素裡沒有示例</span>。<br>
+                示例是 Few-Shot 進階技巧，下節再教。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S33: Task 2 Few-Shot ===== -->
+    <div class="slide" id="slide33">
+        <span class="phase-tag phase-task">Task 2 ／ Few-Shot</span>
+        <span class="timer-tag">01:42 - 01:47</span>
+        <div class="slide-title">🧮 Few-Shot 三段式 + CoT（官方範本）</div>
+        <div class="content">
+            <div class="tip-box" style="font-size:16px;"><code style="background:rgba(76,201,240,0.15);padding:0 6px;border-radius:3px;color:#fff;">##</code> 是 Markdown 標題符號——讓 AI 看清楚段落分界，等於「<span style="color:#fff;">第一段:任務 ／ 第二段:示例 ／ 第三段:問題</span>」。</div>
+            <div class="code-block" style="font-size:15px;"><span style="color:#4cc9f0;">## 任務</span>
+針對選擇題，先給推理過程，再輸出最終選項。
+
+<span style="color:#4cc9f0;">## 示例 1 (CoT 示範)</span>
+題目:中國證監會同意註冊決定有效期是多久？
+選項:A.6個月 B.1年 C.2年 D.3年
+推理過程:根據證券法規定，註冊決定自作出之日起
+         2年內有效，發行人應在有效期內發行。
+         因此正確答案是 C。
+最終選項:C
+
+<span style="color:#4cc9f0;">## 示例 2 (格式對齊)</span>
+題目:小明有 12 支畫筆，給了妹妹 1/4，還剩多少？
+推理過程:12 × 1/4 = 3，12 - 3 = 9。
+         所以剩下 9 支。
+最終選項:答案是 9 支
+
+<span style="color:#4cc9f0;">## 問題</span>
+題目:常用的森林火灾扑火战术不包括哪一种？
+選項:A... B... C... D...</div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:20px;">
+                示例的<span class="cyan">「推理過程」格式</span>要和你要的輸出長得<span class="highlight">一模一樣</span>——<br>
+                Chain-of-Thought 的精髓：<span class="green">讓 AI 「先想後說」</span>，而不是直接猜答案。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S34: Few-Shot 3 Use Cases ===== -->
+    <div class="slide" id="slide34">
+        <span class="phase-tag phase-task">Few-Shot 用法</span>
+        <div class="slide-title">📌 什麼時候要用 Few-Shot？</div>
+        <div class="content">
+            <div class="columns-3">
+                <div class="card">
+                    <h3>① 需要特定格式</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:1.7;">
+                    例：「推理過程 + 最終選項」<br>
+                    例：JSON 結構化輸出<br>
+                    例：表格/條列固定樣式
+                    </p>
+                </div>
+                <div class="card pink">
+                    <h3>② 需要對齊風格</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:1.7;">
+                    例：語氣、長度<br>
+                    例：用詞、語感<br>
+                    例：固定段落結構
+                    </p>
+                </div>
+                <div class="card green-border">
+                    <h3>③ 需要提升推理準確率</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:1.7;">
+                    例：數學題、邏輯題<br>
+                    例：專業知識題<br>
+                    CoT 讓 AI 逐步推理
+                    </p>
+                </div>
+            </div>
+            <div class="keypoint-box yellow-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                示例<span class="cyan">給 2-3 個最穩</span>。1 個叫 One-Shot 效果不穩，超過 3 個會吃字數限制。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S35: Task 3 Qianfan API ===== -->
+    <div class="slide" id="slide35">
+        <span class="phase-tag phase-task">Task 3 ／ API 調用</span>
+        <span class="timer-tag">01:47 - 01:52</span>
+        <div class="slide-title">🔌 千帆大模型 API 調用（流式 / 非流式）</div>
+        <div class="content">
+            <div class="columns">
+                <div class="card">
+                    <h3 style="color:#4cc9f0;">🌊 流式 (stream=true)</h3>
+                    <div class="code-block" style="font-size:14px; line-height:1.6;">const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + API_TOKEN
+    },
+    body: JSON.stringify({
+        model: 'ernie-4.0-8k',
+        <span style="color:#ffd166;">stream: true,</span>
+        messages: [
+            { role: 'system', content: '平台助手'},
+            { role: 'user', content: question }
+        ]
+    })
+});
+
+// 讀取流式數據
+const reader = res.body.getReader();
+const decoder = new TextDecoder('utf-8');
+while (!done) {
+    const { value, done } = await reader.read();
+    buffer += decoder.decode(value, {stream:true});
+    // 逐字顯示在畫面上...
+}</div>
+                </div>
+                <div class="card green-border">
+                    <h3 style="color:#72efdd;">📦 非流式 (stream=false)</h3>
+                    <div class="code-block" style="font-size:14px; line-height:1.6;">import requests
+import json
+
+url = "https://qianfan.baidubce.com/v2/chat/completions"
+
+payload = json.dumps({
+    "model": "ernie-4.0-8k",
+    "messages": [
+        {"role": "system", "content": "平台助手"},
+        {"role": "user", "content": "你好"}
+    ],
+    <span style="color:#ffd166;">"stream": False</span>
+})
+
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer your token'
+}
+
+response = requests.request(
+    "POST", url, headers=headers, data=payload)
+print(response.text)</div>
+                </div>
+            </div>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                <span class="green">stream=true 流式打字機</span>；<span class="cyan">stream=false 一次性 JSON</span>！
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S36: Task 4 RAG ===== -->
+    <div class="slide" id="slide36">
+        <span class="phase-tag phase-task">Task 4 ／ RAG</span>
+        <span class="timer-tag">01:52 - 01:57</span>
+        <div class="slide-title">📚 RAG 知識庫問答 Prompt 設計</div>
+        <div class="content">
+            <div class="tip-box" style="font-size:15px;">RAG = <span style="color:#fff;">Retrieval-Augmented Generation</span>。核心邏輯：<span style="color:#fff;">先檢索、後生成</span>。</div>
+            <div class="code-block" style="font-size:15px; line-height:1.7;"><span style="color:#4cc9f0;">【角色】</span>你是一位專業的汽車維修知識庫問答助手。
+
+<span style="color:#4cc9f0;">【任務】</span>根據以下【檢索結果】，回答【用戶問題】。
+如果【用戶問題】與【檢索結果】無關，
+請嚴格返回指定兜底話術，不要自行發揮。
+
+<span style="color:#4cc9f0;">【檢索結果】</span>
+故障現象:使用离合器时，有异响。
+故障原因:
+  (1)分离轴承磨损严重或缺油...
+  (2)从动盘铆钉松动...
+故障诊断与排除:
+  (1)少许踏下离合器踏板...
+  (2)将踏板踩到底时响...
+
+<span style="color:#4cc9f0;">【用戶問題】</span>
+离合器使用中有异响是怎么回事？
+
+<span style="color:#4cc9f0;">【輸出要求】</span>
+1. 從檢索結果中總結回答，不要添加外部知識
+2. 分條列出可能原因和對應診斷方法
+3. 語氣專業、簡潔</div>
+        </div>
+    </div>
+
+    <!-- ===== S37: RAG Fallback ===== -->
+    <div class="slide" id="slide37">
+        <span class="phase-tag phase-task">Task 4 ／ 兜底話術</span>
+        <div class="slide-title">🛡️ RAG 防幻覺核心：兜底話術設計</div>
+        <div class="content">
+            <div class="warning-box" style="font-size:18px;">RAG 的核心是「<span style="color:#fff;">檢索結果為邊界</span>」——AI 只能根據給定的檢索結果回答，<span style="color:#fff;">不能動用訓練時學到的外部知識</span>。</div>
+            <div class="code-block" style="font-size:16px; margin-top:14px;"><span style="color:#4cc9f0;">【兜底規則】</span>
+如果用戶問題與檢索結果無關，嚴格返回:
+
+「非常抱歉，關於您的問題，小度目前正在學習中，
+ 建議您[聯繫人工客服]以獲得即時幫助!」
+
+─────────────────────────────
+示例(無關問題):
+用戶問題:「百度最新大模型是哪個版本？」
+→ 檢索結果是「離合器故障」，完全無關
+→ <span style="color:#ff4757;">必須返回兜底話術，不能回答「文心一言」等</span></div>
+            <div class="keypoint-box yellow-key" style="margin-top:14px;text-align:center;font-size:20px;">
+                兜底話術防止 AI 「<span class="red">幻覺</span>」——<br>
+                當用戶問題跟檢索結果無關時，強制 AI 說「我不會」，而不是亂編。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S38: RAG vs Normal Prompt ===== -->
+    <div class="slide" id="slide38">
+        <span class="phase-tag phase-task">RAG 對比</span>
+        <div class="slide-title">📊 RAG Prompt vs 普通 Prompt</div>
+        <div class="content">
+            <table class="status-table" style="font-size:17px;">
+                <tr><th>特性</th><th>普通 Prompt</th><th>RAG Prompt</th></tr>
+                <tr><td><span class="cyan">知識來源</span></td><td>AI 用訓練知識回答</td><td>AI 只能用「檢索結果」回答</td></tr>
+                <tr><td><span class="cyan">邊界控制</span></td><td>無邊界，可能幻覺</td><td>有邊界，檢索結果為唯一信源</td></tr>
+                <tr><td><span class="cyan">兜底設計</span></td><td>不需要兜底</td><td><span class="highlight">必須設計兜底話術</span>防無關問題</td></tr>
+                <tr><td><span class="cyan">標記區塊</span></td><td>無需特別標記</td><td>明確標記【檢索結果】【用戶問題】</td></tr>
+            </table>
+            <div class="keypoint-box green-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                RAG Prompt 四要素：<span class="cyan">角色設定 + 檢索結果輸入 + 用戶問題輸入 + 兜底規則</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S39: Breathing Slide Tasks ===== -->
+    <div class="slide" id="slide39">
+        <span class="phase-tag phase-task">板塊結束</span>
+        <span class="timer-tag">深呼吸 → 進入收尾</span>
+        <div class="slide-title">✅ 實操板塊 你已經學會了</div>
+        <div class="content">
+            <div class="agenda-block" style="font-size:22px; line-height:2.4;">
+☑ <span class="cyan">萬能公式</span>：角色 + 背景 + 目標 + 結構 (<span class="red">無示例</span>)
+
+☑ <span class="green">Few-Shot 三段式</span>：任務 / 示例 / 問題，示例給 2-3 個
+
+☑ <span class="orange">千帆 API</span>：stream=true 流式打字機；stream=false 一次性 JSON
+
+☑ <span class="highlight">RAG 知識庫</span>：檢索結果為邊界 + 無關問題兜底話術
+            </div>
+            <div class="keypoint-box yellow-key" style="margin-top:14px;text-align:center;font-size:24px;">
+                <span class="green">深呼吸一下</span> → 接下來是<span class="highlight">必記 10 點 + 三色投票</span>，把今天收進口袋。
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================
+         CLOSING SECTION
+         ===================================== -->
+
+    <!-- ===== S40: Must-Remember Cover ===== -->
+    <div class="slide round-cover" id="slide40">
+        <span class="phase-tag phase-end">收尾</span>
+        <span class="timer-tag">01:57 - 02:00</span>
+        <div class="round-tag">FINAL ／ 必記 10 點</div>
+        <div class="round-title" style="background: linear-gradient(135deg, #ffd166, #ff9a59); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📌 必記 10 點 ＋ 三色投票</div>
+        <div class="round-meta">考前一晚對著念三遍</div>
+    </div>
+
+    <!-- ===== S41: Must Remember 1-5 ===== -->
+    <div class="slide" id="slide41">
+        <span class="phase-tag phase-end">必記 10 點（前半）</span>
+        <div class="slide-title">📌 1 ─ 5：Transformer + VAE + RNN</div>
+        <div class="content">
+            <div class="agenda-block" style="font-size:18px; line-height:2.2;">
+<span class="yellow">1.</span> Transformer 位置編碼 = <span class="green">提供 token 時序位置關係</span>（Q1）
+   全班齊喊：「時序位置！不是特徵提取！」
+
+<span class="yellow">2.</span> Transformer 可以<span class="green">並行處理序列</span>，克服 RNN 限制（Q29）
+   全班齊喊：「並行！不是逐字！」
+
+<span class="yellow">3.</span> FFN = <span class="green">兩層線性變換 + ReLU</span>，計算量很小（Q15）
+   全班齊喊：「ReLU！計算量小！」
+
+<span class="yellow">4.</span> VAE = <span class="green">編碼器 + 解碼器</span>；解碼器是「還原」不是「壓縮」（Q4）
+   全班齊喊：「編壓解還！」
+
+<span class="yellow">5.</span> 廣義 RNN 家族 = <span class="green">RNN + LSTM + GRU</span>，<span class="red">不含 GCN！</span>（Q19）
+   全班齊喊：「RLG！不含 GCN！」
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S42: Must Remember 6-10 ===== -->
+    <div class="slide" id="slide42">
+        <span class="phase-tag phase-end">必記 10 點（後半）</span>
+        <div class="slide-title">📌 6 ─ 10：GAN + 能量基 + Prompt + RAG</div>
+        <div class="content">
+            <div class="agenda-block" style="font-size:18px; line-height:2.2;">
+<span class="yellow">6.</span> DCGAN = <span class="green">CNN + GAN</span>，用卷積替代全連接（Q39）
+   全班齊喊：「卷積替代全連接！不是反過來！」
+
+<span class="yellow">7.</span> WGAN = <span class="green">Wasserstein 距離損失函數</span>（Q12）
+   CycleGAN = <span class="green">循環一致性損失</span>，無需配對數據（Q31）
+   全班齊喊：「W距離！循環一致性！」
+
+<span class="yellow">8.</span> 能量基模型 = <span class="green">真實數據能量盡可能低</span>（Q59）
+   全班齊喊：「真實要低！不是高！」
+
+<span class="yellow">9.</span> Prompt 萬能公式 = <span class="green">角色 + 背景 + 目標 + 結構</span>
+   Few-Shot 用於「格式對齊 + 推理提升」
+   全班齊喊：「四要素！示例對齊！」
+
+<span class="yellow">10.</span> RAG 核心 = <span class="green">檢索結果為邊界 + 無關問題兜底話術</span>
+    全班齊喊：「檢索為界！無關兜底！」
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S43: Three Color Vote ===== -->
+    <div class="slide" id="slide43">
+        <span class="phase-tag phase-end">三色自評</span>
+        <div class="slide-title">🚦 上完這節，你現在的狀態是？</div>
+        <div class="content">
+            <div class="columns-3">
+                <div class="card green-border">
+                    <h3 style="color:#72efdd; text-align:center;font-size:26px;">🟢 綠 = 穩過</h3>
+                    <p style="font-size:17px;color:#a7f3d0;line-height:1.7;text-align:center;margin-top:10px;">
+                    回家把今天的錯題再刷一遍，<br>
+                    週末考試輕鬆過。
+                    </p>
+                </div>
+                <div class="card yellow-border">
+                    <h3 style="color:#ffd166; text-align:center;font-size:26px;">🟡 黃 = 有點懸</h3>
+                    <p style="font-size:17px;color:#fde68a;line-height:1.7;text-align:center;margin-top:10px;">
+                    很正常——剛學完還沒沉澱。<br>
+                    睡前看一遍必記 10 點，<br>
+                    明天就會變綠。
+                    </p>
+                </div>
+                <div class="card red-border">
+                    <h3 style="color:#ff4757; text-align:center;font-size:26px;">🔴 紅 = 很慌</h3>
+                    <p style="font-size:17px;color:#fda4af;line-height:1.7;text-align:center;margin-top:10px;">
+                    舉手不丟臉——<br>
+                    紅色的人就是會多刷一遍題的人，<br>
+                    反而比黃色更穩。
+                    </p>
+                </div>
+            </div>
+            <div class="keypoint-box pink-key" style="margin-top:14px;text-align:center;font-size:22px;">
+                <span class="highlight">情緒收尾比知識收尾更重要</span>——選一個顏色，給自己一個明確的回家清單。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S44: Homework ===== -->
+    <div class="slide" id="slide44">
+        <span class="phase-tag phase-end">課後實戰</span>
+        <div class="slide-title">🌐 課後必做：官網全套實操</div>
+        <div class="content">
+            <div class="warning-box">課堂四個 Task 是<span style="color:#fff;">「示範版」</span>。<span style="color:#fff;">真正計分的實操題在官網</span>——只練課堂版分數會低 30% 以上。</div>
+            <div class="columns" style="margin-top:14px;">
+                <div class="card pink">
+                    <h3>🔥 今晚必做（趁手感熱）</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:2;">
+                    □ 登入官網考試系統<br>
+                    □ 完成全部實操題一次<br>
+                    　（Prompt 設計 + API + RAG）<br>
+                    □ 每題自己寫的 Prompt 截圖<br>
+                    □ 對比課堂四個 Task 找缺漏
+                    </p>
+                </div>
+                <div class="card cyan">
+                    <h3>📅 三天內必做</h3>
+                    <p style="font-size:17px;color:#ddd;line-height:2;">
+                    □ 用實操工作紙重做官網題<br>
+                    □ 對照完整題庫精讀本看官方範例<br>
+                    □ 把官網最低分的 1 題<br>
+                    　重寫 3 個改良版
+                    </p>
+                </div>
+            </div>
+            <div class="keypoint-box yellow-key" style="margin-top:14px;text-align:center;font-size:20px;">
+                趁手感熱、口訣還在腦袋裡，<span class="highlight">今晚立刻去做最有效</span>。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== S45: Closing ===== -->
+    <div class="slide title-slide" id="slide45">
+        <div style="margin-bottom: 22px;"><span style="font-size: 68px;">🎯</span></div>
+        <div style="font-size: 44px; font-weight: bold; line-height: 1.5;">
+            第二小時做完——<br>
+            帶走 <span class="cyan">5 大算法</span> + <span class="highlight">4 個 Prompt 結構</span>
+        </div>
+        <div class="countdown-grid" style="margin-top: 28px; max-width: 920px;">
+            <div class="countdown-card">
+                <div class="count-number" style="color: #4cc9f0;">並行</div>
+                <div class="count-label">Transformer 核心<br>自注意力 + 位置編碼</div>
+            </div>
+            <div class="countdown-card">
+                <div class="count-number" style="color: #72efdd; font-size:22px; line-height:1.3;">D W C</div>
+                <div class="count-label">GAN 家族口訣<br>卷積 / 距離 / 循環</div>
+            </div>
+            <div class="countdown-card">
+                <div class="count-number" style="color: #f72585; font-size:22px; line-height:1.3;">角色+背景<br>+目標+結構</div>
+                <div class="count-label">萬能公式四要素<br>無示例!</div>
+            </div>
+            <div class="countdown-card">
+                <div class="count-number" style="color: #ffd166;">RAG</div>
+                <div class="count-label">檢索為界<br>無關兜底</div>
+            </div>
+        </div>
+        <div style="font-size: 22px; color: #aaa; margin-top: 30px;">
+            考前一晚把<span class="yellow">必記 10 點</span>對著念三遍 → 過線無壓力
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <button onclick="prevSlide()">◀ 上一頁</button>
+        <button onclick="nextSlide()">下一頁 ▶</button>
+    </div>
+
+    <script>
+        const totalSlides = 45;
+        let currentSlide = 1;
+
+        function showSlide(n) {
+            document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+            document.getElementById('slide' + n).classList.add('active');
+            document.getElementById('progressBar').style.width = ((n - 1) / (totalSlides - 1)) * 100 + '%';
+            document.querySelectorAll('.slide-number').forEach(el => el.remove());
+            const currentEl = document.getElementById('slide' + n);
+            const numEl = document.createElement('div');
+            numEl.className = 'slide-number';
+            numEl.textContent = n + ' / ' + totalSlides;
+            currentEl.appendChild(numEl);
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides) { currentSlide++; showSlide(currentSlide); } }
+        function prevSlide() { if (currentSlide > 1) { currentSlide--; showSlide(currentSlide); } }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+            else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+            else if (e.key === 'Home') { currentSlide = 1; showSlide(1); }
+            else if (e.key === 'End') { currentSlide = totalSlides; showSlide(totalSlides); }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+        document.addEventListener('touchend', e => { const d = touchStartX - e.changedTouches[0].clientX; if (Math.abs(d) > 50) { d > 0 ? nextSlide() : prevSlide(); } });
+
+        showSlide(1);
+    </script>
+</body>
+</html>
